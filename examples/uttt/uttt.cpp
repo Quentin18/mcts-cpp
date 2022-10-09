@@ -322,13 +322,17 @@ double UltimateTicTacToeGameState::rollout(PlayerMarker maximizingPlayer) const 
         GameAction *action;
 
         // Run game until we reach a terminal state
+        bool first = true;
         do {
             action = currentState->getRandomAction();
             currentState->makeAction(action);
+            if (!first)  // Do not delete the last action of the current state
+                delete currentState->lastAction;
             currentState->lastAction = new UltimateTicTacToeAction(*((UltimateTicTacToeAction *) action));
             currentState->gameResult = currentState->calculateGameResult();
             currentState->switchPlayer();
             delete action;
+            first = false;
         } while (!currentState->isTerminal());
 
         result = currentState->getGameResult();
