@@ -29,23 +29,23 @@ GameNode::~GameNode() {
 }
 
 GameNode *GameNode::advanceTree(const GameAction *action) {
-    GameNode *nextNode = nullptr;
+    GameNode *nextNode;
 
-    // Find the child corresponding to the action and delete all others
-    for (auto *child : children) {
-        if (*(child->getLastAction()) == *action)
-            nextNode = child;
-        else
-            delete child;
-    }
-
-    // Remove children from list so that they won't be re-deleted by the destructor when this node dies
-    children.clear();
+    // Find the child corresponding to the action
+    auto it = std::find_if(
+            children.begin(),
+            children.end(),
+            [action](const GameNode *child) {
+                return *(child->getLastAction()) == *action;
+            }
+    );
 
     // Check if we found the child, otherwise we create a new node
-    if (nextNode == nullptr) {
+    if (it == children.end()) {
         std::cerr << "INFO: Child not found. Had to start over." << std::endl;
         nextNode = new GameNode(currentState->nextState(action), maximizingPlayer);
+    } else {
+        nextNode = *it;
     }
 
     // Reset parent to set the new node as root

@@ -7,6 +7,7 @@
 
 GameTree::GameTree(GameState *startingState, PlayerMarker maximizingPlayer) {
     root = new GameNode(startingState, maximizingPlayer);
+    currentRoot = root;
 }
 
 GameTree::~GameTree() {
@@ -14,17 +15,15 @@ GameTree::~GameTree() {
 }
 
 void GameTree::advanceTree(const GameAction *action) {
-    GameNode *oldRoot = root;
-    root = root->advanceTree(action);
-    delete oldRoot;
+    currentRoot = currentRoot->advanceTree(action);
 }
 
 GameState *GameTree::getCurrentState() const {
-    return root->getCurrentState();
+    return currentRoot->getCurrentState();
 }
 
 GameNode *GameTree::select(double c) {
-    GameNode *node = root;
+    GameNode *node = currentRoot;
     while (!node->isTerminal()) {
         if (!node->isFullyExpanded())
             return node;
@@ -35,7 +34,7 @@ GameNode *GameTree::select(double c) {
 }
 
 GameNode *GameTree::selectBestChild() {
-    return root->selectBestChild(0.0);
+    return currentRoot->selectBestChild(0.0);
 }
 
 void GameTree::growTree(uint maxIter, uint maxSeconds, bool debug) {
@@ -65,5 +64,5 @@ void GameTree::growTree(uint maxIter, uint maxSeconds, bool debug) {
 }
 
 void GameTree::printStats() const {
-    root->printStats();
+    currentRoot->printStats();
 }

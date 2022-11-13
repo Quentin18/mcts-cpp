@@ -18,6 +18,7 @@
 class GameTree {
 private:
     GameNode *root;
+    GameNode *currentRoot;
 public:
     /**
      * Create a game tree.
