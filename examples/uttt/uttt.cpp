@@ -6,15 +6,24 @@
 #include "uttt.hpp"
 
 UltimateTicTacToeAction::UltimateTicTacToeAction(int row, int col, PlayerMarker playerMarker) :
-        row(row), col(col), playerMarker(playerMarker) {}
+    row(row), col(col), playerMarker(playerMarker) {}
 
 UltimateTicTacToeAction::UltimateTicTacToeAction(const UltimateTicTacToeAction &other) :
-        row(other.row), col(other.col), playerMarker(other.playerMarker) {}
+    row(other.row), col(other.col), playerMarker(other.playerMarker) {}
 
-bool UltimateTicTacToeAction::operator==(const GameAction &other) const {
-    // Cast action
-    const auto &o = (const UltimateTicTacToeAction &) other;
-    return row == o.row && col == o.col && playerMarker == o.playerMarker;
+UltimateTicTacToeAction &UltimateTicTacToeAction::operator=(const UltimateTicTacToeAction &other) {
+    row = other.row;
+    col = other.col;
+    playerMarker = other.playerMarker;
+    return *this;
+}
+
+bool UltimateTicTacToeAction::isEmpty() const {
+    return playerMarker == EMPTY_MARKER || row == -1 || col == -1;
+}
+
+bool UltimateTicTacToeAction::operator==(const UltimateTicTacToeAction &other) const {
+    return row == other.row && col == other.col && playerMarker == other.playerMarker;
 }
 
 std::string UltimateTicTacToeAction::toString() const {
@@ -59,20 +68,17 @@ bool TicTacToeGrid::isEmpty(int row, int col) const {
     return grid[row][col] == EMPTY_MARKER;
 }
 
-bool TicTacToeGrid::isLegalAction(const UltimateTicTacToeAction *action) const {
-    return isEmpty(action->row % 3, action->col % 3);
+bool TicTacToeGrid::isLegalAction(const UltimateTicTacToeAction &action) const {
+    return isEmpty(action.row % 3, action.col % 3);
 }
 
-void TicTacToeGrid::makeAction(const GameAction *action) {
-    // Cast action
-    auto a = (UltimateTicTacToeAction *) action;
-
+void TicTacToeGrid::makeAction(const UltimateTicTacToeAction &action) {
     // Check that the action is legal action
-    if (!isLegalAction(a))
-        throw std::runtime_error("Illegal action: " + a->toString());
+    if (!isLegalAction(action))
+        throw std::runtime_error("Illegal action: " + action.toString());
 
     // Make action
-    grid[a->row % 3][a->col % 3] = a->playerMarker;
+    grid[action.row % 3][action.col % 3] = action.playerMarker;
 }
 
 void TicTacToeGrid::updateGameResult() {
@@ -157,9 +163,7 @@ GameResult UltimateTicTacToeGameState::calculateGameResult() const {
 }
 
 UltimateTicTacToeGameState::UltimateTicTacToeGameState(PlayerMarker startingPlayerMarker) :
-        currentPlayerMarker(startingPlayerMarker),
-        lastAction(nullptr),
-        gameResult(NOT_FINISHED) {}
+    currentPlayerMarker(startingPlayerMarker), gameResult(NOT_FINISHED) {}
 
 UltimateTicTacToeGameState::UltimateTicTacToeGameState(const UltimateTicTacToeGameState &other) :
         masterGrid(other.masterGrid),
@@ -171,8 +175,17 @@ UltimateTicTacToeGameState::UltimateTicTacToeGameState(const UltimateTicTacToeGa
             smallGrids[row][col] = other.smallGrids[row][col];
 }
 
-UltimateTicTacToeGameState::~UltimateTicTacToeGameState() {
-    delete lastAction;
+UltimateTicTacToeGameState &UltimateTicTacToeGameState::operator=(const UltimateTicTacToeGameState &other) {
+    for (int row = 0; row < 3; row++)
+        for (int col = 0; col < 3; col++)
+            smallGrids[row][col] = other.smallGrids[row][col];
+
+    masterGrid = other.masterGrid;
+    currentPlayerMarker = other.currentPlayerMarker;
+    lastAction = other.lastAction;
+    gameResult = other.gameResult;
+
+    return *this;
 }
 
 PlayerMarker UltimateTicTacToeGameState::getcurrentPlayerMarker() const {
@@ -183,16 +196,17 @@ GameResult UltimateTicTacToeGameState::getGameResult() const {
     return gameResult;
 }
 
-bool UltimateTicTacToeGameState::isLegalAction(const UltimateTicTacToeAction *action) const {
+bool UltimateTicTacToeGameState::isLegalAction(const UltimateTicTacToeAction &action) const {
     int gridRowToPlay, gridColToPlay, gridRowPlayed, gridColPlayed;
     bool freeGrid = true;
-    gridRowPlayed = action->row / 3;
-    gridColPlayed = action->col / 3;
+
+    gridRowPlayed = action.row / 3;
+    gridColPlayed = action.col / 3;
 
     // Get small grid to play
-    if (lastAction != nullptr && smallGrids[lastAction->row % 3][lastAction->col % 3].getGameResult() == NOT_FINISHED) {
-        gridRowToPlay = lastAction->row % 3;
-        gridColToPlay = lastAction->col % 3;
+    if (!lastAction.isEmpty() && smallGrids[lastAction.row % 3][lastAction.col % 3].getGameResult() == NOT_FINISHED) {
+        gridRowToPlay = lastAction.row % 3;
+        gridColToPlay = lastAction.col % 3;
         freeGrid = false;
     }
 
@@ -204,28 +218,25 @@ bool UltimateTicTacToeGameState::isLegalAction(const UltimateTicTacToeAction *ac
     return smallGrids[gridRowPlayed][gridColPlayed].isLegalAction(action);
 }
 
-void UltimateTicTacToeGameState::makeAction(const GameAction *action) {
-    // Cast action
-    auto a = (UltimateTicTacToeAction *) action;
-
+void UltimateTicTacToeGameState::makeAction(const UltimateTicTacToeAction &action) {
     // Check that the action is legal
-    if (!isLegalAction(a))
-        throw std::runtime_error("Illegal action: " + a->toString());
+    if (!isLegalAction(action))
+        throw std::runtime_error("Illegal action: " + action.toString());
 
-    int gridRowPlayed = a->row / 3;
-    int gridColPlayed = a->col / 3;
+    int gridRowPlayed = action.row / 3;
+    int gridColPlayed = action.col / 3;
 
     // Update small grid
     TicTacToeGrid *grid = &smallGrids[gridRowPlayed][gridColPlayed];
-    grid->makeAction(a);
+    grid->makeAction(action);
     grid->updateGameResult();
 
     // Update master grid
     GameResult result = grid->getGameResult();
     if (result != NOT_FINISHED) {
         PlayerMarker marker = (result == PLAYER_1_WON) ? PLAYER_1_MARKER : (result == PLAYER_2_WON) ? PLAYER_2_MARKER : DRAW_MARKER;
-        auto masterAction = UltimateTicTacToeAction(gridRowPlayed, gridColPlayed, marker);
-        masterGrid.makeAction(&masterAction);
+        UltimateTicTacToeAction masterAction(gridRowPlayed, gridColPlayed, marker);
+        masterGrid.makeAction(masterAction);
         masterGrid.updateGameResult();
     }
 }
@@ -234,18 +245,20 @@ bool UltimateTicTacToeGameState::isTerminal() const {
     return gameResult != NOT_FINISHED;
 }
 
-std::vector<GameAction *> UltimateTicTacToeGameState::getLegalActions() const {
-    std::vector<GameAction *> actions;
+std::vector<UltimateTicTacToeAction> UltimateTicTacToeGameState::getLegalActions() const {
+    std::vector<UltimateTicTacToeAction> actions;
     const TicTacToeGrid *grid;
 
-    if (lastAction != nullptr && smallGrids[lastAction->row % 3][lastAction->col % 3].getGameResult() == NOT_FINISHED) {
-        grid = &smallGrids[lastAction->row % 3][lastAction->col % 3];
+    if (!lastAction.isEmpty() && smallGrids[lastAction.row % 3][lastAction.col % 3].getGameResult() == NOT_FINISHED) {
+        grid = &smallGrids[lastAction.row % 3][lastAction.col % 3];
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 3; col++) {
-                if (grid->isEmpty(row, col))
-                    actions.push_back(new UltimateTicTacToeAction((lastAction->row % 3) * 3 + row,
-                                                                  (lastAction->col % 3) * 3 + col,
-                                                                  currentPlayerMarker));
+                if (grid->isEmpty(row, col)) {
+                    UltimateTicTacToeAction action((lastAction.row % 3) * 3 + row,
+                                                   (lastAction.col % 3) * 3 + col,
+                                                   currentPlayerMarker);
+                    actions.push_back(action);
+                }
             }
         }
     } else {
@@ -255,10 +268,12 @@ std::vector<GameAction *> UltimateTicTacToeGameState::getLegalActions() const {
                 if (grid->getGameResult() == NOT_FINISHED) {
                     for (int r = 0; r < 3; r++) {
                         for (int c = 0; c < 3; c++) {
-                            if (grid->isEmpty(r, c))
-                                actions.push_back(new UltimateTicTacToeAction((row % 3) * 3 + r,
-                                                                              (col % 3) * 3 + c,
-                                                                              currentPlayerMarker));
+                            if (grid->isEmpty(r, c)) {
+                                UltimateTicTacToeAction action((row % 3) * 3 + r,
+                                                               (col % 3) * 3 + c,
+                                                               currentPlayerMarker);
+                                actions.push_back(action);
+                            }
                         }
                     }
                 }
@@ -269,8 +284,7 @@ std::vector<GameAction *> UltimateTicTacToeGameState::getLegalActions() const {
     return actions;
 }
 
-GameAction *UltimateTicTacToeGameState::getRandomAction() const {
-    GameAction *action;
+UltimateTicTacToeAction UltimateTicTacToeGameState::getRandomAction() const {
     uint actionIndex;
 
     // Get legal actions
@@ -282,31 +296,25 @@ GameAction *UltimateTicTacToeGameState::getRandomAction() const {
 
     // Select random action
     actionIndex = rand() % legalActions.size();
-    for (uint i = 0; i < legalActions.size(); ++i) {
-        if (i == actionIndex)
-            action = legalActions[i];
-        else
-            delete legalActions[i];
-    }
 
-    return action;
+    return legalActions[actionIndex];
 }
 
-GameState *UltimateTicTacToeGameState::nextState(const GameAction *action) const {
+UltimateTicTacToeGameState UltimateTicTacToeGameState::nextState(const UltimateTicTacToeAction &action) const {
     // Create new state from current
-    auto newState = new UltimateTicTacToeGameState(*this);
+    UltimateTicTacToeGameState newState(*this);
 
     // Make action
-    newState->makeAction(action);
+    newState.makeAction(action);
 
     // Update last action
-    newState->lastAction = new UltimateTicTacToeAction(*((UltimateTicTacToeAction *) action));
+    newState.lastAction = action;
 
     // Calculate game result
-    newState->gameResult = newState->calculateGameResult();
+    newState.gameResult = newState.calculateGameResult();
 
     // Change the player turn
-    newState->switchPlayer();
+    newState.switchPlayer();
 
     return newState;
 }
@@ -318,25 +326,19 @@ double UltimateTicTacToeGameState::rollout(PlayerMarker maximizingPlayer) const 
         result = getGameResult();
     } else {
         // Init simulation to current state
-        auto currentState = new UltimateTicTacToeGameState(*this);
-        GameAction *action;
+        UltimateTicTacToeGameState currentState(*this);
+        UltimateTicTacToeAction action;
 
         // Run game until we reach a terminal state
-        bool first = true;
         do {
-            action = currentState->getRandomAction();
-            currentState->makeAction(action);
-            if (!first)  // Do not delete the last action of the current state
-                delete currentState->lastAction;
-            currentState->lastAction = new UltimateTicTacToeAction(*((UltimateTicTacToeAction *) action));
-            currentState->gameResult = currentState->calculateGameResult();
-            currentState->switchPlayer();
-            delete action;
-            first = false;
-        } while (!currentState->isTerminal());
+            action = currentState.getRandomAction();
+            currentState.makeAction(action);
+            currentState.lastAction = action;
+            currentState.gameResult = currentState.calculateGameResult();
+            currentState.switchPlayer();
+        } while (!currentState.isTerminal());
 
-        result = currentState->getGameResult();
-        delete currentState;
+        result = currentState.getGameResult();
     }
 
     // Evaluate game to maximize player

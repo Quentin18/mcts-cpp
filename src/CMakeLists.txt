@@ -1,6 +1,10 @@
 target_sources(MCTS
-        PRIVATE
-            MCTS/Agent.cpp
-            MCTS/Node.cpp
-            MCTS/Tree.cpp
+        PUBLIC
+            MCTS/Action.hpp
+            MCTS/Agent.hpp
+            MCTS/Node.hpp
+            MCTS/State.hpp
+            MCTS/Tree.hpp
         )
+
+target_include_directories(MCTS PUBLIC ${CMAKE_CURRENT_LIST_DIR})

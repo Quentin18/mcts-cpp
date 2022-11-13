@@ -9,8 +9,6 @@
 #include <string>
 #include <vector>
 
-#include <MCTS/Action.hpp>
-
 /**
  * Player marker type.
  */
@@ -25,6 +23,7 @@ enum GameResult { PLAYER_1_WON, PLAYER_2_WON, DRAW, NOT_FINISHED };
  * Base class for game state.
  * This class needs to be implemented for each game.
  */
+template<class Action, class State>
 class GameState {
 public:
     /**
@@ -42,14 +41,14 @@ public:
      * Get legal actions from current state.
      * @return legal actions.
      */
-    virtual std::vector<GameAction *> getLegalActions() const = 0;
+    virtual std::vector<Action> getLegalActions() const = 0;
 
     /**
      * Get the next state from the current state after playing an action.
      * @param action action to play.
      * @return next state.
      */
-    virtual GameState *nextState(const GameAction *action) const = 0;
+    virtual State nextState(const Action &action) const = 0;
 
     /**
      * Simulate a game from the current game state and return a score between 0 and 1.

@@ -11,6 +11,7 @@
 #include <stdexcept>
 #include <vector>
 
+#include <MCTS/Action.hpp>
 #include <MCTS/State.hpp>
 
 #define PLAYER_1_MARKER 'O'
@@ -21,13 +22,16 @@
 /**
  * Ultimate Tic Tac Toe game action.
  */
-struct UltimateTicTacToeAction : public GameAction {
-    int row;
-    int col;
-    PlayerMarker playerMarker;
+struct UltimateTicTacToeAction : public GameAction<UltimateTicTacToeAction> {
+    int row = -1;
+    int col = -1;
+    PlayerMarker playerMarker = EMPTY_MARKER;
+    UltimateTicTacToeAction() = default;
     UltimateTicTacToeAction(int row, int col, PlayerMarker playerMarker);
     UltimateTicTacToeAction(const UltimateTicTacToeAction &other);
-    bool operator==(const GameAction &other) const override;
+    UltimateTicTacToeAction &operator=(const UltimateTicTacToeAction &other);
+    bool isEmpty() const override;
+    bool operator==(const UltimateTicTacToeAction &other) const override;
     std::string toString() const override;
 };
 
@@ -44,8 +48,8 @@ public:
     TicTacToeGrid(const TicTacToeGrid &other);
     char get(int row, int col) const;
     bool isEmpty(int row, int col) const;
-    bool isLegalAction(const UltimateTicTacToeAction *action) const;
-    void makeAction(const GameAction *action);
+    bool isLegalAction(const UltimateTicTacToeAction &action) const;
+    void makeAction(const UltimateTicTacToeAction &action);
     void updateGameResult();
     bool playerWon(PlayerMarker playerMarker) const;
     bool isFull() const;
@@ -57,12 +61,12 @@ public:
 /**
  * Ultimate Tic Tac Toe game state.
  */
-class UltimateTicTacToeGameState : public GameState {
+class UltimateTicTacToeGameState : public GameState<UltimateTicTacToeAction, UltimateTicTacToeGameState> {
 private:
     TicTacToeGrid masterGrid;
     TicTacToeGrid smallGrids[3][3];
     PlayerMarker currentPlayerMarker;
-    UltimateTicTacToeAction *lastAction;
+    UltimateTicTacToeAction lastAction;
     GameResult gameResult;
     void switchPlayer();
     bool playerWon(PlayerMarker playerMarker) const;
@@ -70,15 +74,15 @@ private:
 public:
     explicit UltimateTicTacToeGameState(PlayerMarker startingPlayerMarker);
     UltimateTicTacToeGameState(const UltimateTicTacToeGameState &other);
-    ~UltimateTicTacToeGameState();
+    UltimateTicTacToeGameState &operator=(const UltimateTicTacToeGameState &other);
     PlayerMarker getcurrentPlayerMarker() const override;
     GameResult getGameResult() const override;
-    bool isLegalAction(const UltimateTicTacToeAction *action) const;
-    void makeAction(const GameAction *action);
+    bool isLegalAction(const UltimateTicTacToeAction &action) const;
+    void makeAction(const UltimateTicTacToeAction &action);
     bool isTerminal() const override;
-    std::vector<GameAction *> getLegalActions() const override;
-    GameAction *getRandomAction() const;
-    GameState *nextState(const GameAction *action) const override;
+    std::vector<UltimateTicTacToeAction> getLegalActions() const override;
+    UltimateTicTacToeAction getRandomAction() const;
+    UltimateTicTacToeGameState nextState(const UltimateTicTacToeAction &action) const override;
     double rollout(PlayerMarker maximizingPlayer) const override;
     std::string toString() const override;
 };

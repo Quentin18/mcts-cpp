@@ -11,16 +11,31 @@ TicTacToeAction::TicTacToeAction(int row, int col, PlayerMarker playerMarker) :
 TicTacToeAction::TicTacToeAction(const TicTacToeAction &other) :
     row(other.row), col(other.col), playerMarker(other.playerMarker) {}
 
-bool TicTacToeAction::operator==(const GameAction &other) const {
-    // Cast action
-    const auto &o = (const TicTacToeAction &) other;
-    return row == o.row && col == o.col && playerMarker == o.playerMarker;
+TicTacToeAction &TicTacToeAction::operator=(const TicTacToeAction &other) {
+    row = other.row;
+    col = other.col;
+    playerMarker = other.playerMarker;
+    return *this;
+}
+
+bool TicTacToeAction::isEmpty() const {
+    return playerMarker == EMPTY_MARKER || row == -1 || col == -1;
+}
+
+bool TicTacToeAction::operator==(const TicTacToeAction &other) const {
+    return row == other.row && col == other.col && playerMarker == other.playerMarker;
 }
 
 std::string TicTacToeAction::toString() const {
     std::stringstream ss;
     ss << "row = " << row << ", col = " << col << ", player = " << playerMarker;
     return ss.str();
+}
+
+void TicTacToeGameState::resetBoard() {
+    for (int row = 0; row < 3; row++)
+        for (int col = 0; col < 3; col++)
+            board[row][col] = EMPTY_MARKER;
 }
 
 void TicTacToeGameState::switchPlayer() {
@@ -64,21 +79,26 @@ GameResult TicTacToeGameState::calculateGameResult() const {
 }
 
 TicTacToeGameState::TicTacToeGameState(PlayerMarker startingPlayerMarker) :
-    currentPlayerMarker(startingPlayerMarker),
-    gameResult(NOT_FINISHED) {
-    // Initialize board
-    for (int row = 0; row < 3; row++)
-        for (int col = 0; col < 3; col++)
-            board[row][col] = EMPTY_MARKER;
+    currentPlayerMarker(startingPlayerMarker), gameResult(NOT_FINISHED) {
+    resetBoard();
 }
 
 TicTacToeGameState::TicTacToeGameState(const TicTacToeGameState &other) :
-    currentPlayerMarker(other.currentPlayerMarker),
-    gameResult(other.gameResult) {
-    // Copy board
+    currentPlayerMarker(other.currentPlayerMarker), gameResult(other.gameResult) {
     for (int row = 0; row < 3; row++)
         for (int col = 0; col < 3; col++)
             board[row][col] = other.board[row][col];
+}
+
+TicTacToeGameState &TicTacToeGameState::operator=(const TicTacToeGameState &other) {
+    for (int row = 0; row < 3; row++)
+        for (int col = 0; col < 3; col++)
+            board[row][col] = other.board[row][col];
+
+    currentPlayerMarker = other.currentPlayerMarker;
+    gameResult = other.gameResult;
+
+    return *this;
 }
 
 PlayerMarker TicTacToeGameState::getcurrentPlayerMarker() const {
@@ -89,35 +109,35 @@ GameResult TicTacToeGameState::getGameResult() const {
     return gameResult;
 }
 
-void TicTacToeGameState::makeAction(const GameAction *action) {
-    // Cast action
-    auto a = (TicTacToeAction *) action;
-
+void TicTacToeGameState::makeAction(const TicTacToeAction &action) {
     // Check that the action is legal action
-    if (board[a->row][a->col] != EMPTY_MARKER)
-        throw std::runtime_error("Illegal action: " + a->toString());
+    if (board[action.row][action.col] != EMPTY_MARKER)
+        throw std::runtime_error("Illegal action: " + action.toString());
 
     // Make action
-    board[a->row][a->col] = a->playerMarker;
+    board[action.row][action.col] = action.playerMarker;
 }
 
 bool TicTacToeGameState::isTerminal() const {
     return gameResult != NOT_FINISHED;
 }
 
-std::vector<GameAction *> TicTacToeGameState::getLegalActions() const {
-    std::vector<GameAction *> actions;
+std::vector<TicTacToeAction> TicTacToeGameState::getLegalActions() const {
+    std::vector<TicTacToeAction> actions;
+
     for (int row = 0; row < 3; row++) {
         for (int col = 0; col < 3; col++) {
-            if (board[row][col] == EMPTY_MARKER)
-                actions.push_back(new TicTacToeAction(row, col, currentPlayerMarker));
+            if (board[row][col] == EMPTY_MARKER) {
+                TicTacToeAction action(row, col, currentPlayerMarker);
+                actions.push_back(action);
+            }
         }
     }
+
     return actions;
 }
 
-GameAction *TicTacToeGameState::getRandomAction() const {
-    GameAction *action;
+TicTacToeAction TicTacToeGameState::getRandomAction() const {
     uint actionIndex;
 
     // Get legal actions
@@ -129,28 +149,22 @@ GameAction *TicTacToeGameState::getRandomAction() const {
 
     // Select random action
     actionIndex = rand() % legalActions.size();
-    for (uint i = 0; i < legalActions.size(); ++i) {
-        if (i == actionIndex)
-            action = legalActions[i];
-        else
-            delete legalActions[i];
-    }
 
-    return action;
+    return legalActions[actionIndex];
 }
 
-GameState *TicTacToeGameState::nextState(const GameAction *action) const {
+TicTacToeGameState TicTacToeGameState::nextState(const TicTacToeAction &action) const {
     // Create new state from current
-    auto newState = new TicTacToeGameState(*this);
+    TicTacToeGameState newState(*this);
 
     // Make action
-    newState->makeAction(action);
+    newState.makeAction(action);
 
     // Calculate game result
-    newState->gameResult = newState->calculateGameResult();
+    newState.gameResult = newState.calculateGameResult();
 
     // Change the player turn
-    newState->switchPlayer();
+    newState.switchPlayer();
 
     return newState;
 }
@@ -162,20 +176,18 @@ double TicTacToeGameState::rollout(PlayerMarker maximizingPlayer) const {
         result = getGameResult();
     } else {
         // Init simulation to current state
-        auto currentState = new TicTacToeGameState(*this);
-        GameAction *action;
+        TicTacToeGameState currentState(*this);
+        TicTacToeAction action;
 
         // Run game until we reach a terminal state
         do {
-            action = currentState->getRandomAction();
-            currentState->makeAction(action);
-            currentState->gameResult = currentState->calculateGameResult();
-            currentState->switchPlayer();
-            delete action;
-        } while (!currentState->isTerminal());
+            action = currentState.getRandomAction();
+            currentState.makeAction(action);
+            currentState.gameResult = currentState.calculateGameResult();
+            currentState.switchPlayer();
+        } while (!currentState.isTerminal());
 
-        result = currentState->getGameResult();
-        delete currentState;
+        result = currentState.getGameResult();
     }
 
     // Evaluate game to maximize player
@@ -191,11 +203,13 @@ double TicTacToeGameState::rollout(PlayerMarker maximizingPlayer) const {
 
 std::string TicTacToeGameState::toString() const {
     std::stringstream ss;
+
     ss << "+---+---+---+" << std::endl;
     for (int row = 0; row < 3; row++) {
         for (int col = 0; col < 3; col++)
             ss << "| " << board[row][col] << " ";
         ss << "|" << std::endl << "+---+---+---+" << std::endl;
     }
+
     return ss.str();
 }
