@@ -13,6 +13,7 @@
 
 #include <MCTS/Action.hpp>
 #include <MCTS/State.hpp>
+#include <MCTS/Utils.hpp>
 
 #define PLAYER_1_MARKER 'O'
 #define PLAYER_2_MARKER 'X'

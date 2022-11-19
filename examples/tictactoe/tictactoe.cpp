@@ -138,8 +138,6 @@ std::vector<TicTacToeAction> TicTacToeGameState::getLegalActions() const {
 }
 
 TicTacToeAction TicTacToeGameState::getRandomAction() const {
-    uint actionIndex;
-
     // Get legal actions
     auto legalActions = getLegalActions();
 
@@ -148,9 +146,7 @@ TicTacToeAction TicTacToeGameState::getRandomAction() const {
         throw std::runtime_error("No legal actions.");
 
     // Select random action
-    actionIndex = rand() % legalActions.size();
-
-    return legalActions[actionIndex];
+    return legalActions[RNG() % legalActions.size()];
 }
 
 TicTacToeGameState TicTacToeGameState::nextState(const TicTacToeAction &action) const {

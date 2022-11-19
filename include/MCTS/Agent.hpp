@@ -11,6 +11,7 @@
 #include <vector>
 
 #include <MCTS/Tree.hpp>
+#include <MCTS/Utils.hpp>
 
 /**
  * Base class for game agent.
@@ -132,7 +133,7 @@ public:
             throw std::runtime_error("No legal actions.");
 
         // Select random action
-        actionIndex = rand() % legalActions.size();
+        actionIndex = RNG() % legalActions.size();
         std::cout << "Random action selected: " << legalActions[actionIndex].toString() << std::endl;
 
         return legalActions[actionIndex];
