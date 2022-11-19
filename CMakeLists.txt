@@ -19,7 +19,7 @@ add_library(MCTS)
 
 set_target_properties(MCTS PROPERTIES LINKER_LANGUAGE CXX)
 
-add_subdirectory(src)
+add_subdirectory(include)
 add_subdirectory(examples)
 
 # enable_testing()
