@@ -8,7 +8,7 @@
 #include "tictactoe.hpp"
 
 #define MAX_ITER 100000
-#define MAX_SECONDS 5
+#define MAX_SECONDS 2
 #define DEBUG true
 
 /**
@@ -21,46 +21,36 @@ int main() {
     std::cout << "Welcome to the Tic Tac Toe game!" << std::endl;
 
     // Init game state
-    GameState *state, *nextState;
-    state = new TicTacToeGameState(PLAYER_1_MARKER);
-    std::cout << state->toString() << std::endl;
+    TicTacToeGameState state(PLAYER_1_MARKER);
+    std::cout << state.toString() << std::endl;
 
     // Init game action
-    GameAction *lastAction, *action;
-    lastAction = nullptr;
+    TicTacToeAction action;
 
     // Init agents
-    MonteCarloTreeSearchAgent player1(new TicTacToeGameState(*(TicTacToeGameState *) state),
-                                      PLAYER_1_MARKER, MAX_ITER, MAX_SECONDS, DEBUG);
-    RandomAgent player2;
+    MonteCarloTreeSearchAgent<TicTacToeAction, TicTacToeGameState> player1(
+            state, PLAYER_1_MARKER, MAX_ITER, MAX_SECONDS, DEBUG);
+    RandomAgent<TicTacToeAction, TicTacToeGameState> player2;
 
     // Game loop
     while (true) {
         // Player 1 plays
-        action = player1.getAction(state, lastAction);
-        delete lastAction;
-        lastAction = new TicTacToeAction(*(TicTacToeAction *) action);
-        nextState = state->nextState(lastAction);
-        delete state;
-        state = nextState;
-        std::cout << state->toString() << std::endl;
-        if (state->isTerminal())
+        action = player1.getAction(state, action);
+        state = state.nextState(action);
+        std::cout << state.toString() << std::endl;
+        if (state.isTerminal())
             break;
 
         // Player 2 plays
-        action = player2.getAction(state, lastAction);
-        delete lastAction;
-        lastAction = action;
-        nextState = state->nextState(lastAction);
-        delete state;
-        state = nextState;
-        std::cout << state->toString() << std::endl;
-        if (state->isTerminal())
+        action = player2.getAction(state, action);
+        state = state.nextState(action);
+        std::cout << state.toString() << std::endl;
+        if (state.isTerminal())
             break;
     }
 
     // Display game result
-    switch (state->getGameResult()) {
+    switch (state.getGameResult()) {
         case PLAYER_1_WON:
             std::cout << "Player " << PLAYER_1_MARKER << " won" << std::endl;
             break;
@@ -73,10 +63,6 @@ int main() {
             std::cout << "No winner" << std::endl;
             break;
     }
-
-    // Free memory
-    delete state;
-    delete lastAction;
 
     return EXIT_SUCCESS;
 }

@@ -17,7 +17,8 @@ add_compile_options(-Wall -Wextra -pedantic)
 
 add_library(MCTS)
 
-add_subdirectory(src)
+set_target_properties(MCTS PROPERTIES LINKER_LANGUAGE CXX)
+
 add_subdirectory(include)
 add_subdirectory(examples)
 
