@@ -9,7 +9,6 @@ target_sources(tictactoe
 target_include_directories(tictactoe
         PUBLIC
             ${CMAKE_CURRENT_LIST_DIR}
-            ${CMAKE_SOURCE_DIR}/src
         )
 
 target_link_libraries(tictactoe
