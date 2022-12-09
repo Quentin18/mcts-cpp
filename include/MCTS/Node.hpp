@@ -110,9 +110,7 @@ public:
      * @return win rate.
      */
     double calculateWinRate(PlayerMarker player) const {
-        if (player == maximizingPlayer)
-            return score / visits;
-        return 1.0 - score / visits;
+        return player == maximizingPlayer ? score / visits : 1.0 - score / visits;
     }
 
     /**
