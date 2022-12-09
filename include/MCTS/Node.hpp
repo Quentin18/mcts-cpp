@@ -121,8 +121,7 @@ public:
      * @return UCT policy.
      */
     double uct(const GameNode *child, PlayerMarker player, double c) const {
-        double exploration = c * sqrt(log((double) visits) / (double) child->visits);
-        return child->calculateWinRate(player) + exploration;
+        return child->calculateWinRate(player) + c * sqrt(log((double) visits) / (double) child->visits);
     }
 
     /**
@@ -212,8 +211,7 @@ public:
      * Simulate a game from the current state and back propagate the results.
      */
     void rollout() {
-        double w = currentState.rollout(maximizingPlayer);
-        backPropagate(w, 1);
+        backPropagate(currentState.rollout(maximizingPlayer), 1);
     }
 
     /**
