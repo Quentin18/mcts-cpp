@@ -29,7 +29,7 @@ private:
     Action lastAction;
     std::vector<Action> untriedActions;
     bool terminal;
-    uint numberOfSimulations;
+    uint visits;
     double score;
     PlayerMarker maximizingPlayer;
 public:
@@ -44,7 +44,7 @@ public:
             parent(parent),
             currentState(currentState),
             lastAction(lastAction),
-            numberOfSimulations(0),
+            visits(0),
             score(0.0),
             maximizingPlayer(maximizingPlayer) {
         untriedActions = currentState.getLegalActions();
@@ -59,7 +59,7 @@ public:
     GameNode(const State &currentState, PlayerMarker maximizingPlayer) :
             parent(nullptr),
             currentState(currentState),
-            numberOfSimulations(0),
+            visits(0),
             score(0.0),
             maximizingPlayer(maximizingPlayer) {
         untriedActions = currentState.getLegalActions();
@@ -111,8 +111,8 @@ public:
      */
     double calculateWinRate(PlayerMarker player) const {
         if (player == maximizingPlayer)
-            return score / numberOfSimulations;
-        return 1.0 - score / numberOfSimulations;
+            return score / visits;
+        return 1.0 - score / visits;
     }
 
     /**
@@ -123,7 +123,7 @@ public:
      * @return UCT policy.
      */
     double uct(const GameNode *child, PlayerMarker player, double c) const {
-        double exploration = c * sqrt(log((double) numberOfSimulations) / (double) child->numberOfSimulations);
+        double exploration = c * sqrt(log((double) visits) / (double) child->visits);
         return child->calculateWinRate(player) + exploration;
     }
 
@@ -225,7 +225,7 @@ public:
      */
     void backPropagate(double w, int n) {
         score += w;
-        numberOfSimulations += n;
+        visits += n;
         if (parent != nullptr)
             parent->backPropagate(w, n);
     }
@@ -235,14 +235,14 @@ public:
      */
     void printStats() {
         std::cout << "INFOS:" << std::endl;
-        if (numberOfSimulations == 0) {
+        if (visits == 0) {
             std::cout << "Tree not expanded yet" << std::endl;
             return;
         }
-        std::cout << "Number of simulations: " << numberOfSimulations << std::endl
+        std::cout << "Visits: " << visits << std::endl
                   << "Branching factor at root: " << children.size() << std::endl
                   << "Chances of player winning: " << std::setprecision(PRECISION)
-                  << 100.0 * (score / numberOfSimulations) << "%" << std::endl;
+                  << 100.0 * (score / visits) << "%" << std::endl;
 
         // Sort children based on win rate of player's turn for this node
         PlayerMarker player = currentState.getcurrentPlayerMarker();
