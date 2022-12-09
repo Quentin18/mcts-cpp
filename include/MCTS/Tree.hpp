@@ -86,13 +86,12 @@ public:
      * @param debug true to display logs.
      */
     void growTree(uint maxIter, uint maxSeconds, bool debug) {
-        std::chrono::time_point<std::chrono::system_clock> start;
         std::chrono::duration<double> elapsedSeconds{};
         GameNode<Action, State> *node;
         uint iter = 0;
 
         // Start timer
-        start = std::chrono::system_clock::now();
+        std::chrono::time_point<std::chrono::system_clock> start = std::chrono::system_clock::now();
 
         // Grow tree
         do {
