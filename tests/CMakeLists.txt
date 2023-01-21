@@ -12,15 +12,19 @@ add_executable(unit_tests)
 target_sources(unit_tests
         PRIVATE
             test_tictactoe.cpp
+            test_uttt.cpp
             ${CMAKE_SOURCE_DIR}/examples/tictactoe/tictactoe.cpp
+            ${CMAKE_SOURCE_DIR}/examples/uttt/uttt.cpp
         PUBLIC
             ${CMAKE_SOURCE_DIR}/examples/tictactoe/tictactoe.hpp
+            ${CMAKE_SOURCE_DIR}/examples/uttt/uttt.hpp
         )
 
 target_include_directories(unit_tests
         PUBLIC
             ${CMAKE_CURRENT_LIST_DIR}
             ${CMAKE_SOURCE_DIR}/examples/tictactoe
+            ${CMAKE_SOURCE_DIR}/examples/uttt
         )
 
 target_link_libraries(unit_tests

@@ -1,24 +1,24 @@
 /**
- * Tic Tac Toe Test.
+ * Ultimate Tic Tac Toe Test.
  * @author Quentin Deschamps (mailto:quentindeschamps18@gmail.com)
  * @date 2022
  */
 #include <gtest/gtest.h>
 
 #include <MCTS/Agent.hpp>
-#include "tictactoe.hpp"
+#include "uttt.hpp"
 
 #define MAX_ITER 100000
 #define MAX_SECONDS 1
 #define DEBUG false
-#define NUM_GAMES 100
+#define NUM_GAMES 10
 
-GameResult playTicTacToeGame() {
-    TicTacToeGameState state(PLAYER_1_MARKER);
-    TicTacToeAction action;
-    MonteCarloTreeSearchAgent<TicTacToeAction, TicTacToeGameState> player1(
+GameResult playUltimateTicTacToeGame() {
+    UltimateTicTacToeGameState state(PLAYER_1_MARKER);
+    UltimateTicTacToeAction action;
+    MonteCarloTreeSearchAgent<UltimateTicTacToeAction, UltimateTicTacToeGameState> player1(
             state, PLAYER_1_MARKER, MAX_ITER, MAX_SECONDS, DEBUG);
-    RandomAgent<TicTacToeAction, TicTacToeGameState> player2;
+    RandomAgent<UltimateTicTacToeAction, UltimateTicTacToeGameState> player2;
 
     while (true) {
         action = player1.getAction(state, action);
@@ -35,14 +35,14 @@ GameResult playTicTacToeGame() {
     return state.getGameResult();
 }
 
-TEST(TicTacToeTest, MctsVsRandom)
+TEST(UltimateTicTacToeTest, MctsVsRandom)
 {
     srand(42);
 
     int mctsAgentWins = 0;
 
     for (int i = 0; i < NUM_GAMES; ++i) {
-        switch (playTicTacToeGame()) {
+        switch (playUltimateTicTacToeGame()) {
             case PLAYER_1_WON:
                 std::cout << "MCTS agent won" << std::endl;
                 ++mctsAgentWins;
