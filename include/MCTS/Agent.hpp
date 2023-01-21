@@ -123,8 +123,6 @@ public:
      * @return next action to play.
      */
     Action getAction(const State &state, const Action &lastAction) override {
-        uint actionIndex;
-
         // Get legal actions
         auto legalActions = state.getLegalActions();
 
@@ -133,7 +131,7 @@ public:
             throw std::runtime_error("No legal actions.");
 
         // Select random action
-        actionIndex = RNG() % legalActions.size();
+        uint actionIndex = RNG() % legalActions.size();
         std::cout << "Random action selected: " << legalActions[actionIndex].toString() << std::endl;
 
         return legalActions[actionIndex];
