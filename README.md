@@ -69,6 +69,13 @@ cd build/bin
 ./unit_tests
 ```
 
+## Documentation
+
+You can generate the documentation using `doxygen`:
+```
+doxygen Doxyfile
+```
+
 ## Author
 
 [Quentin Deschamps](mailto:quentindeschamps18@gmail.com)

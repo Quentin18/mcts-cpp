@@ -30,7 +30,7 @@ public:
 
 /**
  * Monte Carlo Tree Search agent.
- * @cite https://en.wikipedia.org/wiki/Monte_Carlo_tree_search
+ * @see https://en.wikipedia.org/wiki/Monte_Carlo_tree_search
  */
 template<class Action, class State>
 class MonteCarloTreeSearchAgent : public Agent<Action, State> {

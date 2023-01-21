@@ -38,3 +38,6 @@ build/
 # Text editor
 .idea
 .vscode
+
+# Documentation directory
+docs/
