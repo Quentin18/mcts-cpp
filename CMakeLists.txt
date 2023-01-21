@@ -13,7 +13,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR})
 
-add_compile_options(-Wall -Wextra -pedantic)
+add_compile_options(-Wall -Wextra -pedantic -O3)
 
 add_library(MCTS)
 
@@ -22,6 +22,6 @@ set_target_properties(MCTS PROPERTIES LINKER_LANGUAGE CXX)
 add_subdirectory(include)
 add_subdirectory(examples)
 
-# enable_testing()
+enable_testing()
 
-# add_subdirectory(test)
+add_subdirectory(tests)
