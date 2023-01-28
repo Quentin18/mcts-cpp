@@ -29,6 +29,7 @@ until the algorithm finds the best move to make.
 ### Build
 
 This project uses [CMake](https://cmake.org/). To build the repository, run the following commands:
+
 ```
 git clone https://github.com/Quentin18/mcts-cpp.git
 cd mcts-cpp
@@ -40,30 +41,31 @@ cmake --build build
 
 Then, you can run the examples:
 
-- [Tic-tac-toe](https://en.wikipedia.org/wiki/Tic-tac-toe)
-- [Ultimate tic-tac-toe](https://en.wikipedia.org/wiki/Ultimate_tic-tac-toe)
+| Game                                                                       | Executable  |
+|----------------------------------------------------------------------------|-------------|
+| [Connect Four](https://en.wikipedia.org/wiki/Connect_Four)                 | `connect4`  |
+| [Tic-tac-toe](https://en.wikipedia.org/wiki/Tic-tac-toe)                   | `tictactoe` |
+| [Ultimate tic-tac-toe](https://en.wikipedia.org/wiki/Ultimate_tic-tac-toe) | `uttt`      |
 
-To run the Tic-tac-toe game, use the `tictactoe` program:
+For example, to run the Tic-tac-toe game:
+
 ```
 cd build/bin
 ./tictactoe
-```
-
-To run the UTTT game, use the `uttt` program:
-```
-cd build/bin
-./uttt
 ```
 
 ## Test
 
 The project contains unit tests using [Google Test](https://github.com/google/googletest).
 You can run the tests either using `ctest`:
+
 ```
 cd build
 ctest
 ```
+
 Or directly using `unit_tests`:
+
 ```
 cd build/bin
 ./unit_tests
@@ -72,6 +74,7 @@ cd build/bin
 ## Documentation
 
 You can generate the documentation using `doxygen`:
+
 ```
 doxygen Doxyfile
 ```
