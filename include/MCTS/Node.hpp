@@ -70,7 +70,7 @@ public:
      * Destroy a game node.
      */
     ~GameNode() {
-        for (auto *child : children)
+        for (auto *child: children)
             delete child;
     }
 

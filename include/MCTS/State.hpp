@@ -17,7 +17,9 @@ typedef char PlayerMarker;
 /**
  * Game results enum.
  */
-enum GameResult { PLAYER_1_WON, PLAYER_2_WON, DRAW, NOT_FINISHED };
+enum GameResult {
+    PLAYER_1_WON, PLAYER_2_WON, DRAW, NOT_FINISHED
+};
 
 /**
  * Base class for game state.

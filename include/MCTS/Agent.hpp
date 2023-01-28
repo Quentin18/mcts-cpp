@@ -75,7 +75,7 @@ public:
         // Print legal actions
         if (debug) {
             std::cout << "Legal actions:" << std::endl;
-            for (const auto &action : state.getLegalActions())
+            for (const auto &action: state.getLegalActions())
                 std::cout << action.toString() << std::endl;
         }
 
