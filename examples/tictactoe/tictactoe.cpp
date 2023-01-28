@@ -6,10 +6,10 @@
 #include "tictactoe.hpp"
 
 TicTacToeAction::TicTacToeAction(int row, int col, PlayerMarker playerMarker) :
-    row(row), col(col), playerMarker(playerMarker) {}
+        row(row), col(col), playerMarker(playerMarker) {}
 
 TicTacToeAction::TicTacToeAction(const TicTacToeAction &other) :
-    row(other.row), col(other.col), playerMarker(other.playerMarker) {}
+        row(other.row), col(other.col), playerMarker(other.playerMarker) {}
 
 TicTacToeAction &TicTacToeAction::operator=(const TicTacToeAction &other) {
     row = other.row;
@@ -55,8 +55,8 @@ bool TicTacToeGameState::playerWon(PlayerMarker playerMarker) const {
 
     // Check diagonals
     return (
-        (board[0][0] == playerMarker && board[1][1] == playerMarker && board[2][2] == playerMarker) ||
-        (board[0][2] == playerMarker && board[1][1] == playerMarker && board[2][0] == playerMarker)
+            (board[0][0] == playerMarker && board[1][1] == playerMarker && board[2][2] == playerMarker) ||
+            (board[0][2] == playerMarker && board[1][1] == playerMarker && board[2][0] == playerMarker)
     );
 }
 
@@ -79,12 +79,12 @@ GameResult TicTacToeGameState::calculateGameResult() const {
 }
 
 TicTacToeGameState::TicTacToeGameState(PlayerMarker startingPlayerMarker) :
-    currentPlayerMarker(startingPlayerMarker), gameResult(NOT_FINISHED) {
+        currentPlayerMarker(startingPlayerMarker), gameResult(NOT_FINISHED) {
     resetBoard();
 }
 
 TicTacToeGameState::TicTacToeGameState(const TicTacToeGameState &other) :
-    currentPlayerMarker(other.currentPlayerMarker), gameResult(other.gameResult) {
+        currentPlayerMarker(other.currentPlayerMarker), gameResult(other.gameResult) {
     for (int row = 0; row < 3; row++)
         for (int col = 0; col < 3; col++)
             board[row][col] = other.board[row][col];

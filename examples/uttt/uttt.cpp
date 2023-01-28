@@ -6,10 +6,10 @@
 #include "uttt.hpp"
 
 UltimateTicTacToeAction::UltimateTicTacToeAction(int row, int col, PlayerMarker playerMarker) :
-    row(row), col(col), playerMarker(playerMarker) {}
+        row(row), col(col), playerMarker(playerMarker) {}
 
 UltimateTicTacToeAction::UltimateTicTacToeAction(const UltimateTicTacToeAction &other) :
-    row(other.row), col(other.col), playerMarker(other.playerMarker) {}
+        row(other.row), col(other.col), playerMarker(other.playerMarker) {}
 
 UltimateTicTacToeAction &UltimateTicTacToeAction::operator=(const UltimateTicTacToeAction &other) {
     row = other.row;
@@ -129,7 +129,7 @@ std::string TicTacToeGrid::toString() const {
     return ss.str();
 }
 
-TicTacToeGrid& TicTacToeGrid::operator=(const TicTacToeGrid &other) {
+TicTacToeGrid &TicTacToeGrid::operator=(const TicTacToeGrid &other) {
     gameResult = other.gameResult;
     for (int row = 0; row < 3; row++)
         for (int col = 0; col < 3; col++)
@@ -163,7 +163,7 @@ GameResult UltimateTicTacToeGameState::calculateGameResult() const {
 }
 
 UltimateTicTacToeGameState::UltimateTicTacToeGameState(PlayerMarker startingPlayerMarker) :
-    currentPlayerMarker(startingPlayerMarker), gameResult(NOT_FINISHED) {}
+        currentPlayerMarker(startingPlayerMarker), gameResult(NOT_FINISHED) {}
 
 UltimateTicTacToeGameState::UltimateTicTacToeGameState(const UltimateTicTacToeGameState &other) :
         masterGrid(other.masterGrid),
@@ -234,7 +234,8 @@ void UltimateTicTacToeGameState::makeAction(const UltimateTicTacToeAction &actio
     // Update master grid
     GameResult result = grid->getGameResult();
     if (result != NOT_FINISHED) {
-        PlayerMarker marker = (result == PLAYER_1_WON) ? PLAYER_1_MARKER : (result == PLAYER_2_WON) ? PLAYER_2_MARKER : DRAW_MARKER;
+        PlayerMarker marker = (result == PLAYER_1_WON) ? PLAYER_1_MARKER : (result == PLAYER_2_WON) ? PLAYER_2_MARKER
+                                                                                                    : DRAW_MARKER;
         UltimateTicTacToeAction masterAction(gridRowPlayed, gridColPlayed, marker);
         masterGrid.makeAction(masterAction);
         masterGrid.updateGameResult();
@@ -352,7 +353,8 @@ std::string UltimateTicTacToeGameState::toString() const {
     std::stringstream ss;
 
     for (int row = 0; row < 9; row++) {
-        ss << (row % 3 == 0 ? "+===+===+===+===+===+===+===+===+===+" : "+---+---+---+---+---+---+---+---+---+") << std::endl;
+        ss << (row % 3 == 0 ? "+===+===+===+===+===+===+===+===+===+" : "+---+---+---+---+---+---+---+---+---+")
+           << std::endl;
         for (int col = 0; col < 9; col++) {
             ss << (col % 3 == 0 ? "| " : ": ") << smallGrids[row / 3][col / 3].get(row % 3, col % 3) << " ";
         }
