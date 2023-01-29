@@ -75,16 +75,16 @@ GameResult ConnectFourGameState::calculateGameResult() const {
 
     // First check row by expanding left from piece placed
     while (colIter >= 0 && board[rowIter][colIter] == player) {
-        counter++;
-        colIter--;
+        ++counter;
+        --colIter;
     }
 
     // Next go right from the piece placed
     colIter = col + 1;
 
     while (colIter < WIDTH && board[rowIter][colIter] == player) {
-        counter++;
-        colIter++;
+        ++counter;
+        ++colIter;
     }
 
     // Check if there were 4 consecutive pieces
@@ -98,16 +98,16 @@ GameResult ConnectFourGameState::calculateGameResult() const {
     colIter = col;
 
     while (rowIter >= 0 && board[rowIter][colIter] == player) {
-        counter++;
-        rowIter--;
+        ++counter;
+        --rowIter;
     }
 
     // Then go up from current piece position
     rowIter = row + 1;
 
     while (rowIter < HEIGHT && board[rowIter][colIter] == player) {
-        counter++;
-        rowIter++;
+        ++counter;
+        ++rowIter;
     }
 
     // Check again if this made a win
@@ -122,9 +122,9 @@ GameResult ConnectFourGameState::calculateGameResult() const {
     colIter = col - 1;
 
     while (rowIter >= 0 && colIter >= 0 && board[rowIter][colIter] == player) {
-        counter++;
-        rowIter--;
-        colIter--;
+        ++counter;
+        --rowIter;
+        --colIter;
     }
 
     // Then expand from current piece to top right
@@ -132,9 +132,9 @@ GameResult ConnectFourGameState::calculateGameResult() const {
     colIter = col + 1;
 
     while (rowIter < HEIGHT && colIter < WIDTH && board[rowIter][colIter] == player) {
-        counter++;
-        rowIter++;
-        colIter++;
+        ++counter;
+        ++rowIter;
+        ++colIter;
     }
 
     // Check if there is a win in this diagonal
@@ -149,9 +149,9 @@ GameResult ConnectFourGameState::calculateGameResult() const {
     colIter = col - 1;
 
     while (rowIter < HEIGHT && colIter >= 0 && board[rowIter][colIter] == player) {
-        counter++;
-        rowIter++;
-        colIter--;
+        ++counter;
+        ++rowIter;
+        --colIter;
     }
 
     // Then expand from current piece to bottom right
@@ -159,9 +159,9 @@ GameResult ConnectFourGameState::calculateGameResult() const {
     colIter = col + 1;
 
     while (rowIter >= 0 && colIter < WIDTH && board[rowIter][colIter] == player) {
-        counter++;
-        rowIter--;
-        colIter++;
+        ++counter;
+        --rowIter;
+        ++colIter;
     }
 
     // Check if there is a win in this diagonal
@@ -183,16 +183,16 @@ ConnectFourGameState::ConnectFourGameState(const ConnectFourGameState &other) :
         currentPlayerMarker(other.currentPlayerMarker),
         lastAction(other.lastAction),
         gameResult(other.gameResult) {
-    for (int col = 0; col < WIDTH; col++) {
-        for (int row = 0; row < HEIGHT; row++)
+    for (int col = 0; col < WIDTH; ++col) {
+        for (int row = 0; row < HEIGHT; ++row)
             board[row][col] = other.board[row][col];
         colHeight[col] = other.getColHeight(col);
     }
 }
 
 ConnectFourGameState &ConnectFourGameState::operator=(const ConnectFourGameState &other) {
-    for (int col = 0; col < WIDTH; col++) {
-        for (int row = 0; row < HEIGHT; row++)
+    for (int col = 0; col < WIDTH; ++col) {
+        for (int row = 0; row < HEIGHT; ++row)
             board[row][col] = other.board[row][col];
         colHeight[col] = other.getColHeight(col);
     }
@@ -231,6 +231,7 @@ bool ConnectFourGameState::isTerminal() const {
 
 std::vector<ConnectFourAction> ConnectFourGameState::getLegalActions() const {
     std::vector<ConnectFourAction> actions;
+    actions.reserve(WIDTH);
 
     for (int col = 0; col < WIDTH; ++col) {
         if (getColHeight(col) < HEIGHT) {
