@@ -35,8 +35,7 @@ GameResult playUltimateTicTacToeGame() {
     return state.getGameResult();
 }
 
-TEST(UltimateTicTacToeTest, MctsVsRandom)
-{
+TEST(UltimateTicTacToeTest, MctsVsRandom) {
     srand(42);
 
     int mctsAgentWins = 0;
