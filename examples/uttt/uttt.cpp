@@ -49,14 +49,14 @@ GameResult TicTacToeGrid::calculateGameResult() const {
 }
 
 TicTacToeGrid::TicTacToeGrid() : gameResult(NOT_FINISHED) {
-    for (int row = 0; row < 3; row++)
-        for (int col = 0; col < 3; col++)
+    for (int row = 0; row < HEIGHT; ++row)
+        for (int col = 0; col < WIDTH; ++col)
             grid[row][col] = EMPTY_MARKER;
 }
 
 TicTacToeGrid::TicTacToeGrid(const TicTacToeGrid &other) : gameResult(other.gameResult) {
-    for (int row = 0; row < 3; row++)
-        for (int col = 0; col < 3; col++)
+    for (int row = 0; row < HEIGHT; ++row)
+        for (int col = 0; col < WIDTH; ++col)
             grid[row][col] = other.grid[row][col];
 }
 
@@ -69,7 +69,7 @@ bool TicTacToeGrid::isEmpty(int row, int col) const {
 }
 
 bool TicTacToeGrid::isLegalAction(const UltimateTicTacToeAction &action) const {
-    return isEmpty(action.row % 3, action.col % 3);
+    return isEmpty(action.row % HEIGHT, action.col % WIDTH);
 }
 
 void TicTacToeGrid::makeAction(const UltimateTicTacToeAction &action) {
@@ -78,7 +78,7 @@ void TicTacToeGrid::makeAction(const UltimateTicTacToeAction &action) {
         throw std::runtime_error("Illegal action: " + action.toString());
 
     // Make action
-    grid[action.row % 3][action.col % 3] = action.playerMarker;
+    grid[action.row % HEIGHT][action.col % WIDTH] = action.playerMarker;
 }
 
 void TicTacToeGrid::updateGameResult() {
@@ -104,8 +104,8 @@ bool TicTacToeGrid::playerWon(PlayerMarker playerMarker) const {
 }
 
 bool TicTacToeGrid::isFull() const {
-    for (int row = 0; row < 3; row++)
-        for (int col = 0; col < 3; col++)
+    for (int row = 0; row < HEIGHT; ++row)
+        for (int col = 0; col < WIDTH; ++col)
             if (isEmpty(row, col))
                 return false;
 
@@ -120,8 +120,8 @@ std::string TicTacToeGrid::toString() const {
     std::stringstream ss;
 
     ss << "+---+---+---+" << std::endl;
-    for (int row = 0; row < 3; row++) {
-        for (int col = 0; col < 3; col++)
+    for (int row = 0; row < HEIGHT; ++row) {
+        for (int col = 0; col < WIDTH; ++col)
             ss << "| " << grid[row][col] << " ";
         ss << "|" << std::endl << "+---+---+---+" << std::endl;
     }
@@ -131,8 +131,8 @@ std::string TicTacToeGrid::toString() const {
 
 TicTacToeGrid &TicTacToeGrid::operator=(const TicTacToeGrid &other) {
     gameResult = other.gameResult;
-    for (int row = 0; row < 3; row++)
-        for (int col = 0; col < 3; col++)
+    for (int row = 0; row < HEIGHT; ++row)
+        for (int col = 0; col < WIDTH; ++col)
             grid[row][col] = other.grid[row][col];
 
     return *this;
@@ -170,14 +170,14 @@ UltimateTicTacToeGameState::UltimateTicTacToeGameState(const UltimateTicTacToeGa
         currentPlayerMarker(other.currentPlayerMarker),
         lastAction(other.lastAction),
         gameResult(other.gameResult) {
-    for (int row = 0; row < 3; row++)
-        for (int col = 0; col < 3; col++)
+    for (int row = 0; row < HEIGHT; ++row)
+        for (int col = 0; col < WIDTH; ++col)
             smallGrids[row][col] = other.smallGrids[row][col];
 }
 
 UltimateTicTacToeGameState &UltimateTicTacToeGameState::operator=(const UltimateTicTacToeGameState &other) {
-    for (int row = 0; row < 3; row++)
-        for (int col = 0; col < 3; col++)
+    for (int row = 0; row < HEIGHT; ++row)
+        for (int col = 0; col < WIDTH; ++col)
             smallGrids[row][col] = other.smallGrids[row][col];
 
     masterGrid = other.masterGrid;
@@ -200,13 +200,14 @@ bool UltimateTicTacToeGameState::isLegalAction(const UltimateTicTacToeAction &ac
     int gridRowToPlay, gridColToPlay, gridRowPlayed, gridColPlayed;
     bool freeGrid = true;
 
-    gridRowPlayed = action.row / 3;
-    gridColPlayed = action.col / 3;
+    gridRowPlayed = action.row / HEIGHT;
+    gridColPlayed = action.col / WIDTH;
 
     // Get small grid to play
-    if (!lastAction.isEmpty() && smallGrids[lastAction.row % 3][lastAction.col % 3].getGameResult() == NOT_FINISHED) {
-        gridRowToPlay = lastAction.row % 3;
-        gridColToPlay = lastAction.col % 3;
+    if (!lastAction.isEmpty() &&
+        smallGrids[lastAction.row % HEIGHT][lastAction.col % WIDTH].getGameResult() == NOT_FINISHED) {
+        gridRowToPlay = lastAction.row % HEIGHT;
+        gridColToPlay = lastAction.col % WIDTH;
         freeGrid = false;
     }
 
@@ -223,8 +224,8 @@ void UltimateTicTacToeGameState::makeAction(const UltimateTicTacToeAction &actio
     if (!isLegalAction(action))
         throw std::runtime_error("Illegal action: " + action.toString());
 
-    int gridRowPlayed = action.row / 3;
-    int gridColPlayed = action.col / 3;
+    int gridRowPlayed = action.row / HEIGHT;
+    int gridColPlayed = action.col / WIDTH;
 
     // Update small grid
     TicTacToeGrid *grid = &smallGrids[gridRowPlayed][gridColPlayed];
@@ -248,32 +249,31 @@ bool UltimateTicTacToeGameState::isTerminal() const {
 
 std::vector<UltimateTicTacToeAction> UltimateTicTacToeGameState::getLegalActions() const {
     std::vector<UltimateTicTacToeAction> actions;
+    actions.reserve(HEIGHT * WIDTH);
     const TicTacToeGrid *grid;
 
-    if (!lastAction.isEmpty() && smallGrids[lastAction.row % 3][lastAction.col % 3].getGameResult() == NOT_FINISHED) {
-        grid = &smallGrids[lastAction.row % 3][lastAction.col % 3];
-        for (int row = 0; row < 3; row++) {
-            for (int col = 0; col < 3; col++) {
+    if (!lastAction.isEmpty() &&
+        smallGrids[lastAction.row % HEIGHT][lastAction.col % WIDTH].getGameResult() == NOT_FINISHED) {
+        grid = &smallGrids[lastAction.row % HEIGHT][lastAction.col % WIDTH];
+        for (int row = 0; row < HEIGHT; ++row) {
+            for (int col = 0; col < WIDTH; ++col) {
                 if (grid->isEmpty(row, col)) {
-                    UltimateTicTacToeAction action((lastAction.row % 3) * 3 + row,
-                                                   (lastAction.col % 3) * 3 + col,
-                                                   currentPlayerMarker);
-                    actions.push_back(action);
+                    actions.emplace_back((lastAction.row % HEIGHT) * HEIGHT + row,
+                                         (lastAction.col % WIDTH) * WIDTH + col,
+                                         currentPlayerMarker);
                 }
             }
         }
     } else {
-        for (int row = 0; row < 3; row++) {
-            for (int col = 0; col < 3; col++) {
+        for (int row = 0; row < HEIGHT; ++row) {
+            for (int col = 0; col < WIDTH; ++col) {
                 grid = &smallGrids[row][col];
                 if (grid->getGameResult() == NOT_FINISHED) {
-                    for (int r = 0; r < 3; r++) {
-                        for (int c = 0; c < 3; c++) {
+                    for (int r = 0; r < HEIGHT; ++r) {
+                        for (int c = 0; c < WIDTH; ++c) {
                             if (grid->isEmpty(r, c)) {
-                                UltimateTicTacToeAction action((row % 3) * 3 + r,
-                                                               (col % 3) * 3 + c,
-                                                               currentPlayerMarker);
-                                actions.push_back(action);
+                                actions.emplace_back((row % HEIGHT) * HEIGHT + r, (col % WIDTH) * WIDTH + c,
+                                                     currentPlayerMarker);
                             }
                         }
                     }
@@ -352,11 +352,12 @@ double UltimateTicTacToeGameState::rollout(PlayerMarker maximizingPlayer) const 
 std::string UltimateTicTacToeGameState::toString() const {
     std::stringstream ss;
 
-    for (int row = 0; row < 9; row++) {
-        ss << (row % 3 == 0 ? "+===+===+===+===+===+===+===+===+===+" : "+---+---+---+---+---+---+---+---+---+")
+    for (int row = 0; row < HEIGHT * WIDTH; ++row) {
+        ss << (row % HEIGHT == 0 ? "+===+===+===+===+===+===+===+===+===+" : "+---+---+---+---+---+---+---+---+---+")
            << std::endl;
-        for (int col = 0; col < 9; col++) {
-            ss << (col % 3 == 0 ? "| " : ": ") << smallGrids[row / 3][col / 3].get(row % 3, col % 3) << " ";
+        for (int col = 0; col < HEIGHT * WIDTH; ++col) {
+            ss << (col % WIDTH == 0 ? "| " : ": ")
+               << smallGrids[row / HEIGHT][col / WIDTH].get(row % HEIGHT, col % WIDTH) << " ";
         }
         ss << "|" << std::endl;
     }

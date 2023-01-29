@@ -19,6 +19,8 @@
 #define PLAYER_2_MARKER 'X'
 #define EMPTY_MARKER '.'
 #define DRAW_MARKER '~'
+#define HEIGHT 3
+#define WIDTH 3
 
 /**
  * Ultimate Tic Tac Toe game action.
@@ -48,7 +50,7 @@ struct UltimateTicTacToeAction : public GameAction<UltimateTicTacToeAction> {
  */
 class TicTacToeGrid {
 private:
-    char grid[3][3]{};
+    char grid[HEIGHT][WIDTH]{};
     GameResult gameResult;
 
     GameResult calculateGameResult() const;
@@ -85,7 +87,7 @@ public:
 class UltimateTicTacToeGameState : public GameState<UltimateTicTacToeAction, UltimateTicTacToeGameState> {
 private:
     TicTacToeGrid masterGrid;
-    TicTacToeGrid smallGrids[3][3];
+    TicTacToeGrid smallGrids[HEIGHT][WIDTH];
     PlayerMarker currentPlayerMarker;
     UltimateTicTacToeAction lastAction;
     GameResult gameResult;
