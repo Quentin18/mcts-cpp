@@ -75,13 +75,11 @@ public:
     }
 
     /**
-     * Advance the tree to the next node.
+     * Find the child corresponding to the action.
      * @param action last action.
+     * @return child node or null pointer if not found.
      */
-    GameNode *advanceTree(const Action &action) {
-        GameNode<Action, State> *nextNode;
-
-        // Find the child corresponding to the action
+    GameNode *findChild(const Action &action) {
         auto it = std::find_if(
                 children.begin(),
                 children.end(),
@@ -90,18 +88,15 @@ public:
                 }
         );
 
-        // Check if we found the child, otherwise we create a new node
-        if (it == children.end()) {
-            std::cerr << "INFO: Child not found. Had to start over." << std::endl;
-            nextNode = new GameNode(currentState.nextState(action), maximizingPlayer);  // TODO free memory
-        } else {
-            nextNode = *it;
-        }
+        return it != children.end() ? *it : nullptr;
+    }
 
-        // Reset parent to set the new node as root
-        nextNode->parent = nullptr;
-
-        return nextNode;
+    /**
+     * Set parent node.
+     * @param node parent node.
+     */
+    void setParent(GameNode *node) {
+        parent = node;
     }
 
     /**
@@ -163,6 +158,14 @@ public:
      */
     const Action &getLastAction() const {
         return lastAction;
+    }
+
+    /**
+     * Get maximizing player marker.
+     * @return maximizing player marker.
+     */
+    PlayerMarker getMaximizingPlayer() const {
+        return maximizingPlayer;
     }
 
     /**

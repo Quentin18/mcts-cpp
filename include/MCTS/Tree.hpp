@@ -42,7 +42,24 @@ public:
      * @param action last action.
      */
     void advanceTree(const Action &action) {
-        currentRoot = currentRoot->advanceTree(action);
+        GameNode<Action, State> *nextNode;
+
+        auto it = currentRoot->findChild(action);
+
+        // Check if we found the child, otherwise we create a new node
+        if (it != nullptr) {
+            nextNode = it;
+        } else {
+            std::cerr << "INFO: Child not found. Had to start over." << std::endl;
+            nextNode = new GameNode<Action, State>(currentRoot->getCurrentState().nextState(action),
+                                                   currentRoot->getMaximizingPlayer());
+            delete root;
+            root = nextNode;
+        }
+
+        // Set current root
+        nextNode->setParent(nullptr);
+        currentRoot = nextNode;
     }
 
     /**
