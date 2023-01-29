@@ -33,8 +33,8 @@ std::string TicTacToeAction::toString() const {
 }
 
 void TicTacToeGameState::resetBoard() {
-    for (int row = 0; row < 3; row++)
-        for (int col = 0; col < 3; col++)
+    for (int row = 0; row < HEIGHT; ++row)
+        for (int col = 0; col < WIDTH; ++col)
             board[row][col] = EMPTY_MARKER;
 }
 
@@ -43,7 +43,7 @@ void TicTacToeGameState::switchPlayer() {
 }
 
 bool TicTacToeGameState::playerWon(PlayerMarker playerMarker) const {
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 3; ++i) {
         // Check rows
         if (board[i][0] == playerMarker && board[i][1] == playerMarker && board[i][2] == playerMarker)
             return true;
@@ -70,8 +70,8 @@ GameResult TicTacToeGameState::calculateGameResult() const {
         return PLAYER_2_WON;
 
     // Check not finished
-    for (int row = 0; row < 3; row++)
-        for (int col = 0; col < 3; col++)
+    for (int row = 0; row < HEIGHT; ++row)
+        for (int col = 0; col < WIDTH; ++col)
             if (board[row][col] == EMPTY_MARKER)
                 return NOT_FINISHED;
 
@@ -85,14 +85,14 @@ TicTacToeGameState::TicTacToeGameState(PlayerMarker startingPlayerMarker) :
 
 TicTacToeGameState::TicTacToeGameState(const TicTacToeGameState &other) :
         currentPlayerMarker(other.currentPlayerMarker), gameResult(other.gameResult) {
-    for (int row = 0; row < 3; row++)
-        for (int col = 0; col < 3; col++)
+    for (int row = 0; row < HEIGHT; ++row)
+        for (int col = 0; col < WIDTH; ++col)
             board[row][col] = other.board[row][col];
 }
 
 TicTacToeGameState &TicTacToeGameState::operator=(const TicTacToeGameState &other) {
-    for (int row = 0; row < 3; row++)
-        for (int col = 0; col < 3; col++)
+    for (int row = 0; row < HEIGHT; ++row)
+        for (int col = 0; col < WIDTH; ++col)
             board[row][col] = other.board[row][col];
 
     currentPlayerMarker = other.currentPlayerMarker;
@@ -124,15 +124,12 @@ bool TicTacToeGameState::isTerminal() const {
 
 std::vector<TicTacToeAction> TicTacToeGameState::getLegalActions() const {
     std::vector<TicTacToeAction> actions;
+    actions.reserve(HEIGHT * WIDTH);
 
-    for (int row = 0; row < 3; row++) {
-        for (int col = 0; col < 3; col++) {
-            if (board[row][col] == EMPTY_MARKER) {
-                TicTacToeAction action(row, col, currentPlayerMarker);
-                actions.push_back(action);
-            }
-        }
-    }
+    for (int row = 0; row < HEIGHT; ++row)
+        for (int col = 0; col < WIDTH; ++col)
+            if (board[row][col] == EMPTY_MARKER)
+                actions.emplace_back(row, col, currentPlayerMarker);
 
     return actions;
 }
@@ -201,8 +198,8 @@ std::string TicTacToeGameState::toString() const {
     std::stringstream ss;
 
     ss << "+---+---+---+" << std::endl;
-    for (int row = 0; row < 3; row++) {
-        for (int col = 0; col < 3; col++)
+    for (int row = 0; row < HEIGHT; ++row) {
+        for (int col = 0; col < WIDTH; ++col)
             ss << "| " << board[row][col] << " ";
         ss << "|" << std::endl << "+---+---+---+" << std::endl;
     }

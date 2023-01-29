@@ -18,6 +18,8 @@
 #define PLAYER_1_MARKER 'O'
 #define PLAYER_2_MARKER 'X'
 #define EMPTY_MARKER '.'
+#define HEIGHT 3
+#define WIDTH 3
 
 /**
  * Tic Tac Toe game action.
@@ -47,7 +49,7 @@ struct TicTacToeAction : public GameAction<TicTacToeAction> {
  */
 class TicTacToeGameState : public GameState<TicTacToeAction, TicTacToeGameState> {
 private:
-    char board[3][3]{};
+    char board[HEIGHT][WIDTH]{};
     PlayerMarker currentPlayerMarker;
     GameResult gameResult;
 
